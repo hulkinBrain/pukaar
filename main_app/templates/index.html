@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Delhi State Warm Line Consultation Service</title>
+        {% include 'headImports.html' %}
+    </head>
+    <body>
+    <div class="master-container container">
+        <div class="service-name" style="text-align: center;">
+            <h2>Delhi State Warm Line Consultation Service</h2>
+        </div>
+        <div class="mainButtonContainer">
+            <button data-target="queryFormModal" class="btn modal-trigger blue">Ask a Query</button>
+            {% if user.is_authenticated %}
+                <a class="btn red lighten-2 waves-effect waves-light" href={% url 'logout' %}>Logout</a>
+            {% else %}
+                <a class="btn red waves-effect waves-light" href="{% url 'social:begin' 'google-oauth2' %}">
+                    Expert Login
+                </a>
+            {% endif %}
+        </div>
+
+        <div id="queryFormModal" class="modal modal-fixed-footer queryFormContainer">
+            <div class="modal-content row" style="padding: 10px;">
+                {% include 'queryForm.html' %}
+            </div>
+            <div class="modal-footer">
+                <a href="" class="btn-flat modal-action modal-close waves-effect waves-red">Cancel</a>
+                <button class="submitQueryButton btn-flat waves-effect waves-green">Submit Query</button>
+            </div>
+        </div>
+    </div>
+    <style>
+        .master-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+    </style>
+
+    {% include 'jsImports.html' %}
+    <script>
+        var selectElem = document.querySelector('select');
+        var selectInstance = M.Select.init(selectElem);
+        var modalElem = document.querySelector('.modal');
+        var modalInstance = M.Modal.init(modalElem);
+    </script>
+    <script>
+        $(".submitQueryButton").click(function(event){
+            event.preventDefault();
+            frm = $('#queryForm');
+            $.ajax({
+                type: frm.attr('method'),
+                url: frm.attr('action'),
+                data: frm.serialize(),
+                success: function (data, status, xhr) {
+                    var ct = xhr.getResponseHeader("content-type") || "";
+                    if(ct.indexOf('json') > -1){
+                        keys = Object.keys(data);
+                        $("span[helper-for]").html("");
+                        for(i=0;i<keys.length;i++){
+                            $("span[helper-for="+keys[i]+"]").html(Object.values(data)[i]);
+                        }
+                    }
+                    else{
+                        M.toast({html: data});
+                        modalInstance.close();
+                    }
+
+                },
+                error: function(response){
+                    keys = Object.keys(response);
+                    for(i=0;i<keys.length;i++){
+                        console.log(keys[i], Object.values(response)[i]);
+                    }
+
+                }
+            });
+        });
+        qualField = $("select[name='qualification']");
+        qualField.change(function(){
+            qual_add_info_TextField = $("input[name='qual_add_info']");
+
+            if($("select[name='qualification'] option:selected").text() === "MBBS"){
+                qual_add_info_TextField.attr('disabled', '');
+                qual_add_info_TextField.css("cursor", "not-allowed");
+                qual_add_info_TextField.siblings().css("cursor", "not-allowed");
+                qual_add_info_TextField.parent().css("cursor", "not-allowed");
+                $("input[name='qual_add_info']").val("");
+                $("label[for='id_qual_add_info']").removeClass("active");
+                $("span[helper-for='qual_add_info']").html("");
+            }
+            else{
+                qual_add_info_TextField.removeAttr("disabled");
+                qual_add_info_TextField.prop("required", true);
+                qual_add_info_TextField.css("cursor", "initial");
+                qual_add_info_TextField.siblings().css("cursor", "initial");
+                qual_add_info_TextField.parent().css("cursor", "initial");
+            }
+        });
+    </script>
+    </body>
+</html>

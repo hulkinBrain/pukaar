@@ -1,0 +1,36 @@
+<form action="submitQuery/" method="post" id="queryForm" class="col s12">
+    {% csrf_token %}
+    {% for field in queryForm %}
+
+        {% if  forloop.counter <= 3 %}
+            <div class="input-field col s4">
+        {% elif forloop.counter == 4 %}
+            <div class="input-field col l5 m6 s12">
+        {% elif forloop.counter == 5 %}
+            <div class="input-field col l7 m6 s12">
+        {% else %}
+            <div class="input-field col s12">
+        {% endif %}
+
+        {% if forloop.counter != 4 %}
+                {{ field }}
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                <strong><span class="helper-text" helper-for="{{ field.name }}"></span></strong>
+        {% else %}
+                <div class="radioGroup row" style="display: flex; margin-top: 10px; margin-left: 0; justify-content: space-between; align-items: center">
+                    <div><strong class="grey-text">{{ field.label }}:</strong></div>
+                    {% for choice in queryForm.practice_type.field.choices %}
+                        <div>
+                            <label for="{{ field.auto_id }}_{{ forloop.counter }}">
+                                <input name="{{ field.name }}" id="{{ field.auto_id }}_{{ forloop.counter }}" required
+                                       value="{{ choice.0 }}" type="radio" {% if forloop.counter == 1 %}checked{% endif %}/>
+                                <span>{{ choice.1 }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                    <strong><span class="helper-text" helper-for="{{ field.name }}"></span></strong>
+                </div>
+        {% endif %}
+            </div>
+    {% endfor %}
+</form>
