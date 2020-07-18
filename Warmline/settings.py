@@ -26,7 +26,7 @@ SECRET_KEY = 'a96(yhnsd$*+y4()&_j=hb%^3w&qlswlsk-hktdz_yd@@b&h$0'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'https://pukaar1.herokuapp.com', 'http://pukaar1.herokuapp.com']
 
 # Application definition
 
