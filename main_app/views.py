@@ -543,7 +543,7 @@ class SendTo:
             html_content = render_to_string('email/admin/post_query_submit_email.html', {"query": query})
             msg = EmailMultiAlternatives(
                 subject="New Query #" + str(query.id) + " received",
-                to="warmline02@gmail.com"
+                to=["warmline02@gmail.com"]
             )
             msg.attach_alternative(html_content, "text/html")
             msg.send()
