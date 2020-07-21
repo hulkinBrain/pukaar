@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from django.core import serializers
+from django.conf import settings
+
 import pytz
 
 from google.cloud import speech
@@ -35,9 +37,10 @@ import numpy as np
 from main_app.forms import QueryForm, ReplyForm, SetExpertForm, LocalhostLoginForm
 from main_app.models import Query, Expert, Reply
 from main_app.transcript_data_extractor import data_extractor
-from Warmline.settings import ADMIN_EMAILS
+
 
 ITEMS_PER_PAGE = 10
+ADMIN_EMAILS = settings.ADMIN_EMAILS
 
 def index(request):
     queryForm = QueryForm()
