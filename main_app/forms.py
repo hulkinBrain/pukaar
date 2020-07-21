@@ -20,7 +20,7 @@ class QueryForm(ModelForm):
         }
         widgets = {
             'area_of_practice': Textarea(attrs={'class': 'materialize-textarea'}),
-            'qual_add_info': TextInput(attrs={'disabled':''}),
+            'qual_add_info': TextInput(attrs={'disabled': ''}),
             'mobile_no': TextInput(attrs={'placeholder': '9876543210'}),
             'query': Textarea(attrs={'class': 'materialize-textarea'}),
         }
