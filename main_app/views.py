@@ -71,9 +71,9 @@ def submit_query(request):
                             query_start_time=timezone.now()
                         )
             new_query.save()
-
-            send_to_admin = SendTo.Admin()
-            send_to_initiator = SendTo.Initiator()
+            sendTo = SendTo()
+            send_to_admin = sendTo.Admin()
+            send_to_initiator = sendTo.Initiator()
 
             send_to_admin.new_query_notify(new_query)
             send_to_initiator.new_query_notify(new_query)
