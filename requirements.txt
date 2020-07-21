@@ -56,7 +56,7 @@ requests==2.24.0
 requests-oauthlib==0.8.0
 rsa==4.6
 six==1.15.0
-social-auth-app-django==2.1.0
+social-auth-app-django==4.0.0
 social-auth-core==3.3.3
 sqlparse==0.3.1
 stevedore==3.2.0
