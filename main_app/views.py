@@ -541,7 +541,7 @@ class SendTo:
         def new_query_notify(self, query):
             # FOR ADMINS
             html_content = render_to_string('email/admin/post_query_submit_email.html', {"query": query})
-            msg = EmailMessage(subject, html_content, to=[settings.EMAIL_HOST_USER])
+            msg = EmailMessage("Hi", html_content, to=[settings.EMAIL_HOST_USER])
             msg.content_subtype = "html"
             msg.send()
 
