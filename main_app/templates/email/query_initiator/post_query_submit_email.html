@@ -1,0 +1,15 @@
+<div>
+    Greetings Dr. {{ query.name }},
+    <p>Thankyou for using Warmline Service, we have received your query and will get back to you within 24 hours.</p>
+    <div>
+        <p><b>Query Number: </b> {{ query.id }}</p>
+        <b>Query Body:</b>
+        <div style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 3px;">
+            {{ query.query|linebreaks }}
+        </div>
+        <p>
+            Best Regards,<br>
+            Warmline
+        </p>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+{% load tz %}
+
+<div>
+    <div style="padding-left: 5px; border-radius: 3px; border-left: 3px #ff9800 solid;">
+        <p><b>Doctor Name: </b> Dr. {{ query.name }}</p>
+        <p><b>Qualification: </b> {{ query.qualification }} ({{ query.qual_add_info }})</p>
+        <p><b>Area of Practice: </b>{% if query.qualification == "OTR" %}Other{% else %}{{ query.qualification }} {% endif %}</p>
+        <p><b>Practice Type: </b> {% if query.practice_type == '1' %}Public{% else %}Private{% endif %}</p>
+        <p><b>Mobile Number: </b> {{ query.mobile_no }}</p>
+    </div>
+    <div style="margin-top: 40px; padding-left: 5px; border-radius: 3px; border-left: 3px #316DAC solid;">
+        <p><b>Query Number: </b> {{ query.id }}</p>
+        <b>Query Body:</b>
+        <div style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 3px;">
+            {{ query.query|linebreaks }}
+        </div>
+        <p><b>Query Initiation Time: </b> {{ query.query_start_time|timezone:"Asia/Kolkata" }}</p>
+    </div>
+</div>

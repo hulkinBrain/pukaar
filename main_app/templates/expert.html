@@ -1,0 +1,227 @@
+{% load tz %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expert Home</title>
+    {% include 'headImports.html' %}
+    {% include 'jsImports.html' %}
+</head>
+<body class="grey lighten-4">
+
+    {% if user.is_authenticated %}
+        <div class="replyFormContainer row">
+            <div class="query-collection-container container">
+                <div style="float: right;"><a class="btn waves-effect waves-red red lighten-2" href={% url 'logout' %}>Logout</a></div>
+                <div class="query-collection">
+                    <div class="query-collection-header"><h4>Queries for Dr. {{ user.first_name }}</h4></div>
+                    <div class="defaultQueryContainer">
+                        {% if noOfPages > 1 %}
+                           <ul class="pagination center-align" style="margin-top: 30px;">
+                           {% for pageNo in var|range1:noOfPages%}
+                               <li class="{% if request.GET.page == None and forloop.counter == 1 or request.GET.page|isEqual:forloop.counter %}active{% endif %} waves-effect"><a href="?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                           {% endfor %}
+                           </ul>
+                        {% endif %}
+                        {% if queries.paginator.count > 0 %}
+                            <ul>
+
+                            {% for query in queries %}
+                                <li class="query-container">
+                                    <div class="provider-name" style="margin-top: 30px;">
+                                        <b>
+                                        <span class="querySno grey-text text-darken-1" style="font-size: 1.3rem">
+                                            #{{ query.id }}
+                                        </span>
+                                            Provider Name:
+                                        </b>
+                                        {{ query.name }}
+                                    </div>
+                                    <div class="card query-collection-item" style="padding: 10px;">
+                                        <div class="row">
+
+                                            <div class="provider-qualification col l6 m6 s12">
+                                                <b>Qualification: </b><br>
+                                                {% if query.qualification == "SPC" %}
+                                                    Specialist
+                                                {% elif query.qualification == "Other" %}
+                                                    Other
+                                                {% else %}
+                                                    MBBS
+                                                {% endif %}
+                                                {% if query.qual_add_info != None %}
+                                                    ({{ query.qual_add_info }})
+                                                {% endif %}
+                                            </div>
+                                            <div class="provider-email col l6 m6 s12">
+                                                <b>Email: </b><br>{{ query.email }}
+                                            </div>
+                                        </div>
+                                        <div class="row area-of-practice col s12">
+                                            <b>Area of Practice: </b>{{ query.area_of_practice }}
+                                        </div>
+                                        <div class="row query-details" style="margin: 0">
+                                            <div class="row" style="margin: 0 0 5px 0 ;">
+                                                <div class="col s2"><b>Query:</b></div>
+                                            </div>
+                                            <div class="query grey lighten-3"
+                                                 style="border-radius: 3px; padding: 2px 5px 5px 5px; margin: 0 7px;">
+                                                {{ query.query|linebreaks }}
+                                            </div>
+                                        </div>
+                                        <div class="row query-start-time" style="margin: 10px 10px 5px 10px;">
+                                            <div>
+                                                <b>Query Initiated
+                                                    on: </b>{{ query.query_start_time|timezone:"Asia/Kolkata" }}
+                                            </div>
+                                        </div>
+                                        <div class="reply-container" style="margin: 10px 10px 5px 10px;">
+                                            <div class="row reply-header" style="margin: 0 0 5px 0;">
+                                                <div><b>Previous Replies:</b></div>
+                                            </div>
+                                            <div class="row reply-body" style="border-left: 3px #316DAC solid; border-radius: 3px; padding-left: 5px;">
+                                            {% for reply in replies %}
+                                                {% if reply.query.id == query.id %}
+                                                    <div class="reply-content grey lighten-3" data-present="True" style="padding: 5px 5px; margin-top: 20px; border-left: 3px #ff9800 solid; border-radius: 3px;">
+                                                        <div class="reply-expert-name">
+                                                            <strong>Expert Name:</strong>
+                                                            Dr. {{ reply.expert.user.first_name }} {{ reply.expert.user.last_name }}
+                                                        </div>
+
+                                                        <div class="reply-content">
+                                                            <strong>Reply: </strong>
+                                                            {{ reply.reply|linebreaks }}
+                                                        </div>
+                                                        {% if reply.reply_extra != None and reply.reply_extra != "" %}
+                                                        <div class="reply-extra">
+                                                            <strong>Extra Comments: </strong>
+                                                            {{ reply.reply_extra|linebreaks }}
+                                                        </div>
+                                                        {% endif %}
+                                                        <div class="reply-time">
+                                                            <strong>Reply Time: </strong>
+                                                            {{ reply.reply_datetime|timezone:"Asia/Kolkata" }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="row query-feedback-{{ forloop.counter }}">
+                                            <form class="col s12" queryId="{{ query.id }}" name="replyForm" id="replyForm-{{ forloop.counter }}">
+                                                {% csrf_token %}
+                                                {% for field in replyForm.visible_fields %}
+                                                    <div class="input-field">
+                                                        {{ field }}
+                                                        <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                                                        <b><span class="helper-text" helper-for="{{ field.name }}-{{ forloop.parentloop.counter }}"></span></b>
+                                                    </div>
+                                                {% endfor %}
+                                                {% for field in replyForm.hidden_fields %}
+                                                    {{ field }}
+                                                {% endfor %}
+
+                                                <div button-for="{{ forloop.counter }}" class="replyFormSubmitButton btn waves-effect green waves-yellow">
+                                                    <div class="preloader-container" style="display: flex; align-items: center;">
+                                                        <div class="preloader" style="display: flex;"></div>
+                                                        <div class="loader-text-data">Send Reply</div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% if noOfPages > 1 %}
+                           <ul class="pagination center-align" style="margin-top: 30px;">
+                           {% for pageNo in var|range1:noOfPages%}
+                               <li class="{% if request.GET.page == None and forloop.counter == 1 or request.GET.page|isEqual:forloop.counter %}active{% endif %} waves-effect"><a href="?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                           {% endfor %}
+                           </ul>
+                        {% endif %}
+                        {% else %}
+                            <p class="flow-text center-align" style="margin-top: 100px;">No queries Exist for you</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% include 'searchbar.html' %}
+    <script>
+        window.replyFormSubmitButtonAction = function(idx, frm, queryId){
+            element = $(".replyFormSubmitButton[button-for="+idx+"] .preloader-container");
+            $(".replyFormSubmitButton[button-for="+idx+"]").removeClass("red lighten-2").addClass("green");
+            loaderTextData = element.find(".loader-text-data");
+            circleLoader = element.find(".circle-loader");
+            checkmark = element.find(".checkmark");
+            preloader = element.find(".preloader");
+
+            element.find(".preloader").html("");
+            loaderTextData.html("").html("Sending");
+            preloader.html("{% filter escapenewline %}{% filter addslashes %}{% include 'preloaders/loader_with_tick.html' %}{% endfilter %}{% endfilter %}")
+            $(".helper-text").html("");
+
+            frm.children("input[name='queryId']").val(queryId);
+            $.ajax({
+                type: "post",
+                url: {% url 'submitQueryReply' %},
+                data: frm.serialize(),
+                success: function (response, status, xhr) {
+                    var ct = xhr.getResponseHeader("content-type") || "";
+                    if (ct.indexOf('json') > -1) {
+                        element.find(".loader-text-data").html("Error");
+                        $(".replyFormSubmitButton[button-for="+idx+"]").removeClass("green").addClass("red lighten-2");
+                        element.find(".preloader").html("");
+                        keys = Object.keys(response);
+                        $("span[helper-for]").html("");
+                        for (i = 0; i < keys.length; i++) {
+                            $("span[helper-for=" + keys[i] + "-" + idx + "]").html(Object.values(response)[i]);
+                        }
+                    }
+                    else {
+                        $(".replyFormSubmitButton[button-for="+idx+"]").removeClass("red lighten-2").addClass("green");
+                        element.find(".loader-text-data").html("Sent");
+                        element.find(".circle-loader").toggleClass('load-complete');
+                        element.find(".checkmark").toggle();
+                        setTimeout(
+                            function() {
+                                if (idx === "-1") {
+                                    window.location.href = "{% url 'home' %}";
+                                }
+                                else{
+                                    queryContainer = element.closest(".query-container");
+                                    if (!(queryContainer.is(":last-child") && queryContainer.is(":first-child"))) {
+                                        element.closest(".query-container").addClass("animated fadeOutLeft");
+                                        setTimeout(
+                                            function () {
+                                                element.closest(".query-container").remove();
+                                            }, 200
+                                        );
+                                    }
+                                    else
+                                        window.location.href = "{% url 'home' %}";
+                                }
+                            }, 1500
+                        );
+
+                        M.toast({html: response + " for&nbsp<b>Query #" + queryId + "</b>"});
+                    }
+
+                },
+                error: function (response) {
+                    console.log("response" + response);
+                }
+            });
+        };
+        $(".replyFormSubmitButton").click(function () {
+            idx = $(this).attr("button-for");
+            frm = $("#replyForm-" + idx);
+            queryId = frm.attr("queryId");
+            replyFormSubmitButtonAction(idx, frm, queryId);
+        });
+    </script>
+</body>
+</html>

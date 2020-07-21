@@ -1,0 +1,278 @@
+{% load custom_filters %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Generate Reports</title>
+        {% include 'headImports.html' %}
+{% include 'jsImports.html' %}
+    </head>
+    <body>
+        <div class="graph-element-master-container container">
+            <div class="white graph-type-normal-selection row myCard" style="padding: 10px 20px 0 20px;">
+                <div class="row myCard-header">Graph Type:</div>
+                <form method="get" action="{% url 'report' %}" id="report_generator_form" name="report_generator_form"
+                      style="display: flex; justify-content: space-around; flex-wrap: wrap; align-items: center">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                        <label>
+                            <input name="report_type" type="radio" value="1" checked/>
+                            <span>Daily</span>
+                        </label>
+                        <label>
+                            <input name="report_type" type="radio" value="2"/>
+                            <span>Weekly</span>
+                        </label>
+                        <label>
+                            <input name="report_type" type="radio" value="3"/>
+                            <span>Monthly</span>
+                        </label>
+                        <label>
+                            <input name="report_type" type="radio" value="4"/>
+                            <span>Overall</span>
+                        </label>
+                    </div>
+                    <div class="btn waves-effect myBtn" onclick="ajaxFormHandler(document.querySelector('#report_generator_form'))">
+                        <div class="preloader-container" style="display: flex; align-items: center;">
+                            <div class="preloader"></div>
+                            <div class="loader-text-data">Generate Graphs</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="white custom-range-container row myCard" style="padding: 10px 20px 0 20px;">
+                <div class="row myCard-header">Custom Range:</div>
+                <form name="custom-range-form" enctype="multipart/form-data" id="custom-range-form">
+                    <div>
+                        <div class="input-field col s6">
+                            <input id="custom_from" type="text" name="custom_from" class="datepicker">
+                            <label for="custom_from">From:</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="custom_to" type="text" name="custom_to" class="datepicker">
+                            <label for="custom_to">To:</label>
+                        </div>
+                        <input name="report_type" type="hidden" value="5"/>
+                    </div>
+                    <div class="btn waves-effect myBtn" onclick="customRangeFormHandler()">
+                        <div class="preloader-container" style="display: flex; align-items: center;">
+                            <div class="preloader"></div>
+                            <div class="loader-text-data">Generate Graphs</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <button style="color: black; background-color: #f5a7bd; display: block; margin: 0 auto;" class="btn waves-effect" onclick="graphModalToggle()">Show
+                Graph page
+            </button>
+        </div>
+
+        <div class="graph-modal white">
+            <div style="text-align: right; margin-top: 10px; margin-right: 10px;"><i
+                    class="graph-modal-close-button material-icons"
+                    onclick="graphModalToggle()">close</i></div>
+            <div class="graph-title" style="text-align: center; font-size: 18px; font-weight: 600;">{{ timeStr }}</div>
+            <div class="graph-container">
+                <div class="graph public_private_count_graph">
+                    {{ public_private_count_graph|safe }}
+                </div>
+                <div class="graph district_wise_practitioner_dist_graph">
+                    {{ district_wise_practitioner_dist_graph|safe }}
+                </div>
+                <div class="graph">
+                    {{ experts_consulted_graph|safe }}
+                </div>
+                <div class="graph">
+                    {{ provider_qualification_graph|safe }}
+                </div>
+                <div class="graph">
+                    {{ reply_time_graph|safe }}
+                </div>
+            </div>
+        </div>
+
+        <style>
+            :root{
+                --success-color: #840C17 !important;
+                --loader-360-color: #F9A6AE !important;
+            }
+            .preloader{
+                display: none;
+            }
+        </style>
+        <style media="screen">
+
+            label {
+                margin-left: 20px;
+            }
+            body{
+                background-color: #14486e;
+            }
+            #custom-range-form {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                align-items: center
+            }
+
+            .graph-container {
+                display: flex;
+                align-items: center;
+                justify-items: center;
+                flex-direction: column;
+            }
+
+            .graph > svg {
+                width: 100%;
+                max-width: 600px;
+                height: initial;
+            }
+
+            .graph {
+                margin-bottom: 50px;
+            }
+
+            .graph-modal {
+                position: absolute;
+                top: 0;
+                z-index: 100;
+                display: none;
+                width: 100%;
+            }
+
+            .graph-modal > .graph-container {
+                margin: 10px 10px 0 10px;
+            }
+
+            .graph-modal-close-button {
+                cursor: pointer;
+            }
+
+            .graph-type-normal-selection > form > div > label {
+                margin-left: 20px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .myCard-header {
+                font-weight: 500;
+                display: block;
+                background-color: #abb1d5;
+                border-radius: 5px;
+                font-size: 16px;
+                margin-top: -32px;
+                box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+                padding: 10px;
+                padding-left: 20px;
+            }
+
+            .myBtn {
+                background-color: #c74753 !important;
+            }
+
+            .myCard {
+                border-radius: 5px;
+                margin-top: 50px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            }
+        </style>
+        <style media="print">
+            .graph-modal {
+                position: absolute;
+                top: 0;
+                z-index: 100;
+                display: none;
+                width: 100%;
+            }
+
+            .graph-container {
+                display: block;
+                text-align: center;
+            }
+
+            .graph-modal-close-button {
+                display: none;
+            }
+        </style>
+        <script>
+            var datePickerElems = document.querySelectorAll('.datepicker');
+            var datePickerInstance = M.Datepicker.init(datePickerElems, {
+                "format": "dd-mm-yyyy",
+                "onOpen": function () {
+                    document.querySelector("#custom_from").readOnly = true;
+                    document.querySelector("#custom_to").readOnly = true;
+                },
+                "maxDate": new Date(Date.now())
+            });
+
+            function graphModalToggle() {
+                closeButton = document.querySelector(".graph-modal-close-button");
+                graphModal = document.querySelector(".graph-modal");
+                graphModal.style.display = graphModal.style.display === "none" ? "block" : "none";
+            }
+
+        </script>
+        <script>
+            function customRangeFormHandler(event) {
+                customFrom = $("#custom_from");
+                customFromVal = customFrom.val();
+                customTo = $("#custom_to");
+                customToVal = customTo.val();
+
+                if (customFromVal === "" || customToVal === "") {
+                    if (customFromVal === "") {
+                        M.toast({html: "Custom from field empty"});
+                    }
+                    if (customToVal === "") {
+                        M.toast({html: "Custom To field empty"});
+                    }
+                }
+                else {
+                    {#ajaxFormHandler($("#custom-range-form"));#}
+                    ajaxFormHandler(document.querySelector("#custom-range-form"));
+                }
+            }
+
+            function ajaxFormHandler(form) {
+
+                var request = new XMLHttpRequest();
+                var params = new URLSearchParams(new FormData(form));
+                request.open('GET', "{% url 'report' %}" + "?" + params, true);
+
+                formElement = form;
+                preloader = formElement.querySelector(".preloader");
+                preloader.innerHTML = "{% filter escapenewline %}{% filter addslashes %}{% include 'preloaders/loader_with_tick.html' %}{% endfilter %}{% endfilter %}";
+                preloader.style.display = "flex";
+                formElement.querySelector(".checkmark").style.display = "none";
+                formElement.querySelector(".circle-loader").classList.remove('load-complete');
+                loaderTextData = formElement.querySelector(".loader-text-data");
+                loaderTextData.innerHTML = "Generating";
+
+                request.onload = function () {
+                    if (request.status >= 200 && request.status < 400) {
+                        var parser = new DOMParser();
+                        var htmlDoc = parser.parseFromString(request.response, "text/html");
+                        div = htmlDoc.querySelectorAll(".graph-container div");
+
+                        graphContainer = document.querySelector(".graph-container");
+                        graphContainer.innerHTML = "";
+                        for (i = 0; i < div.length; i++) {
+                            graphContainer.appendChild(div[i]);
+                        }
+                        formElement.querySelector(".loader-text-data").innerHTML = "Generated";
+                        formElement.querySelector(".circle-loader").classList.toggle('load-complete');
+                        formElement.querySelector(".checkmark").style.display = "block";
+
+                        document.querySelector(".graph-title").innerHTML = htmlDoc.querySelector(".graph-title").innerHTML;
+                        document.querySelector(".graph-modal").style.display = "block";
+                    }
+                    else {
+                        M.toast({html: "Server Error"});
+                    }
+                };
+                request.onerror = function () {
+                    console.log("Bada error");
+                };
+                request.send();
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,79 @@
+{% load custom_filters %}
+<div class="searchResultContainer container">
+
+</div>
+<div class="searchBarContainer">
+    <nav>
+        <div class="nav-wrapper white">
+            <form>
+                <div class="input-field">
+                    <form>
+                    <input class="search" id="search" placeholder="Enter query number here" type="search" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                    </form>
+                        <label class="label-icon" for="search"><i class="material-icons black-text">search</i></label>
+                </div>
+            </form>
+        </div>
+    </nav>
+</div>
+<style>
+    .searchBarContainer {
+        border-radius: 3px;
+        z-index: 10;
+        position: fixed;
+        width: 300px;
+        top: 110px;
+        right: -245px;
+        transition: right .25s ease-in-out
+    }
+
+    .searchBarContainer:hover {
+        transition: right .25s ease-in-out;
+        right: 0 !important
+    }
+</style>
+<script>
+    searchContainer = $("#search");
+    searchContainer
+        .focusin(function () {
+            $(".searchBarContainer").css({
+                right: "0px"
+            })
+        })
+        .focusout(function () {
+            this.value = this.value.replace(/^\s+|\s+$/g, "");
+            customRightval = 14 * this.value.length;
+            customRightval > 245 && (customRightval = 245);
+            $(".searchBarContainer").css({right: "calc(-245px + " + customRightval + "px)"});
+        });
+</script>
+<script>
+    searchContainer = $("#search");
+    searchContainer.keyup(function(){
+        searchQueryId = searchContainer.val();
+        if(searchQueryId !== ""){
+            $(".defaultQueryContainer").hide();
+            $(".searchResultContainer").show();
+            {#$(".searchResultContainer").html("{% filter escapenewline %}{% filter addslashes %}{% include "preloaders/normal_loader.html" %}{% endfilter %}{% endfilter %}");#}
+            $.ajax({
+                type: "GET",
+                url: {% url 'searchQueryView' %},
+                data: {searchQueryId: searchQueryId, userHash: "{{ userHash }}"},
+                success: function (response) {
+                    $(".searchResultContainer").html(response).css({"display": "", "height": "", "text-align": "left"});
+                },
+                error: function (response) {
+                    $(".searchResultContainer").html("<h4>No such query exists</h4>")
+                        .css({
+                            "display":"flex", "justify-content":"center", "align-items":"center",
+                            "height":"calc(100vh - 48px - 1.52rem)", "flex-direction":"column", "text-align": "center"
+                        });
+                }
+            });
+        }
+        else{
+            $(".searchResultContainer").hide();
+            $(".defaultQueryContainer").show();
+        }
+    });
+</script>

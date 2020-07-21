@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Delhi State Warm Line Consultation Service</title>
+        {% include 'headImports.html' %}
+    </head>
+    <body>
+        <div class="master-container container" style="height: 100vh; display: flex; justify-content: center; align-items: center;">
+            <div class="service-name" style="text-align: center;">
+                {% if data == "yes" %}
+                    <h3>Thankyou for the response, your query has been closed.</h3>
+                    <p style="font-size: 18px;">Thankyou for using Warmline service.</p>
+                {% elif data == "expired"%}
+                    <h3>The link has expired.</h3>
+                    <p style="font-size: 18px;">Thankyou for using Warmline service.</p>
+                {% elif data == "no"%}
+                    <h3>We are sorry that the response wasn't satisfactory.</h3>
+                    <p style="font-size: 18px;">A new expert will be assigned to your query and you will be kept updated.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% include 'jsImports.html' %}
+    </body>
+</html>

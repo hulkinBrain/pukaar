@@ -1,0 +1,92 @@
+<div class="circle-loader">
+    <div class="checkmark draw"></div>
+</div>
+{#<p><button id="toggle" type="button" class="btn btn-success">Toggle Completed</button></p>#}
+<style>
+    :root{
+        --success-color: #1b5e20;
+        --loader-360-color: #a5d6a7;
+        --loader-size: 20px;
+        --check-thickness: 1px;
+        --check-height: calc(var(--loader-size)/2);
+        --check-width: calc(var(--check-height)/2);
+        --check-left: calc(var(--loader-size)/6 + var(--loader-size)/12);
+        --check-color: var(--success-color);
+    }
+    .circle-loader {
+        border: 1px solid var(--loader-360-color);
+        border-left-color: var(--success-color);
+        animation: loader-spin 1.2s infinite linear;
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        border-radius: 50%;
+        width: var(--loader-size);
+        height: var(--loader-size);
+        margin-right: 10px;
+    }
+
+    .load-complete {
+        -webkit-animation: none;
+        animation: none;
+        background-color: var(--loader-360-color);
+        border-color: var(--check-color);
+        transition: border 500ms ease-out, background-color 500ms ease;
+    }
+
+    .checkmark {
+        display: none;
+    }
+
+    .checkmark.draw:after {
+        animation-duration: 800ms;
+        animation-timing-function: ease;
+        animation-name: checkmark;
+        transform: scaleX(-1) rotate(135deg);
+    }
+
+    .checkmark:after {
+        opacity: 1;
+        height: var(--check-height);
+        width: var(--check-width);
+        transform-origin: left top;
+        border-right: var(--check-thickness) solid var(--check-color);
+        border-top: var(--check-thickness) solid var(--check-color);
+        content: """";
+        left: calc(var(--check-left) - 1px);
+        top: calc(var(--check-height) - 1px);
+        position: absolute;
+    }
+
+    @keyframes loader-spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes checkmark {
+        0% {
+            height: 0;
+            width: 0;
+            opacity: 1;
+        }
+        20% {
+            height: 0;
+            width: var(--check-width);
+            opacity: 1;
+        }
+        40% {
+            height: var(--check-height);
+            width: var(--check-width);
+            opacity: 1;
+        }
+        100% {
+            height: var(--check-height);
+            width: var(--check-width);
+            opacity: 1;
+        }
+    }
+</style>

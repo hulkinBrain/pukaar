@@ -1,0 +1,160 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Delhi State Warm Line Consultation Service</title>
+        {% include 'headImports.html' %}
+    </head>
+    <body>
+    <style>
+        @media only screen and (max-width: 500px) {
+            .mainButtonContainer > a{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin-top: 20px;
+            }
+        }
+    </style>
+    <div class="master-container container">
+        <div class="service-name" style="text-align: center;">
+            <h2>Delhi State Warm Line Consultation Service</h2>
+        </div>
+        <div class="mainButtonContainer">
+            <button data-target="queryFormModal" class="btn waves-light modal-trigger blue">Ask a Query</button>
+            {% if user.is_authenticated %}
+                <a class="btn red lighten-2 waves-effect waves-light" href={% url 'logout' %}>Logout</a>
+            {% else %}
+                <a class="btn red waves-effect waves-light" href="{% url 'social:begin' 'google-oauth2' %}">
+                    Expert Login
+                </a>
+            {% endif %}
+        </div>
+{#        <div class="localhostLogin">#}
+{#            <form action="{% url 'locahostLogin' %}" method="post">#}
+{#                {% csrf_token %}#}
+{#                {{ localhostLoginForm }}#}
+{#                <input type="submit" class="btn" value="Login"/>#}
+{#            </form>#}
+{#        </div>#}
+
+        <div id="queryFormModal" class="modal modal-fixed-footer queryFormContainer">
+            <div class="modal-content row" style="padding: 10px;">
+                {% include 'queryForm.html' %}
+            </div>
+            <div class="modal-footer">
+                <a href="" class="btn-flat modal-action modal-close waves-effect waves-red">Cancel</a>
+{#                <button class="btn-flat waves-effect waves-green">Submit Query</button>#}
+                <div class="btn waves-effect submitQueryButton myBtn">
+                    <div class="preloader-container" style="display: flex; align-items: center;">
+                        <div class="preloader"></div>
+                        <div class="loader-text-data">Submit Query</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .master-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+        :root{
+            --success-color: #2e7d32 !important;
+            --loader-360-color: #a5d6a7 !important;
+        }
+
+        .preloader {
+            display: none;
+        }
+        .submitQueryButton{
+            background-color: #03a9f4;
+        }
+        .submitQueryButton:hover{
+            background-color: #4fc3f7;
+        }
+    </style>
+
+    {% include 'jsImports.html' %}
+    <script>
+        var selectElem = document.querySelector('select');
+        var selectInstance = M.Select.init(selectElem);
+        var modalElem = document.querySelector('.modal');
+        var modalInstance = M.Modal.init(modalElem);
+    </script>
+    <script>
+        $(".submitQueryButton").click(function(event){
+            event.preventDefault();
+            frm = $('#queryForm');
+
+            document.querySelector(".submitQueryButton").style.backgroundColor = "#8bc34a";
+            preloader = document.querySelector(".preloader");
+            preloader.innerHTML = "{% filter escapenewline %}{% filter addslashes %}{% include 'preloaders/loader_with_tick.html' %}{% endfilter %}{% endfilter %}";
+            preloader.style.display = "flex";
+            preloader.querySelector(".checkmark").style.display = "none";
+            preloader.querySelector(".circle-loader").classList.remove('load-complete');
+            document.querySelector(".loader-text-data").innerHTML = "Sending";
+
+            $.ajax({
+                type: frm.attr('method'),
+                url: frm.attr('action'),
+                data: frm.serialize(),
+                success: function (data, status, xhr) {
+                    var ct = xhr.getResponseHeader("content-type") || "";
+                    if(ct.indexOf('json') > -1){
+                        keys = Object.keys(data);
+                        $("span[helper-for]").html("");
+                        for(i=0;i<keys.length;i++){
+                            $("span[helper-for="+keys[i]+"]").html(Object.values(data)[i]);
+                        }
+                        document.querySelector(".loader-text-data").innerHTML = "Error";
+                        document.querySelector(".submitQueryButton").style.backgroundColor = "#f44336";
+                        document.querySelector(".preloader").style.display = "none";
+                    }
+                    else{
+                        document.querySelector(".submitQueryButton").style.backgroundColor = "#4caf50";
+                        document.querySelector(".loader-text-data").innerHTML = "Sent";
+                        document.querySelector(".circle-loader").classList.toggle('load-complete');
+                        document.querySelector(".checkmark").style.display = "block";
+                        setTimeout(function(){M.toast({html: data}); modalInstance.close();}, 1500);
+                    }
+
+                },
+                error: function(response){
+                    keys = Object.keys(response);
+                    for(i=0;i<keys.length;i++){
+                        console.log(keys[i], Object.values(response)[i]);
+                    }
+
+                }
+            });
+        });
+        qualField = $("select[name='qualification']");
+        qualField.change(function(){
+            qual_add_info_TextField = $("input[name='qual_add_info']");
+
+            if($("select[name='qualification'] option:selected").text() === "MBBS"){
+                qual_add_info_TextField.attr('disabled', '');
+                qual_add_info_TextField.css("cursor", "not-allowed");
+                qual_add_info_TextField.siblings().css("cursor", "not-allowed");
+                qual_add_info_TextField.parent().css("cursor", "not-allowed");
+                $("input[name='qual_add_info']").val("");
+                $("label[for='id_qual_add_info']").removeClass("active");
+                $("span[helper-for='qual_add_info']").html("");
+            }
+            else{
+                qual_add_info_TextField.removeAttr("disabled");
+                qual_add_info_TextField.prop("required", true);
+                qual_add_info_TextField.css("cursor", "initial");
+                qual_add_info_TextField.siblings().css("cursor", "initial");
+                qual_add_info_TextField.parent().css("cursor", "initial");
+            }
+        });
+    </script>
+    </body>
+</html>

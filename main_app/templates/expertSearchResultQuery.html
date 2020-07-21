@@ -1,0 +1,124 @@
+{% load tz %}
+<style>
+    @media only screen and (max-width: 500px){
+        strong{
+            font-weight: bold;
+        }
+        .searched-query-header{
+            margin-top: 100px;
+        }
+        .searched-query-provider-name{
+            margin-top: 0px !important;
+        }
+    }
+</style>
+<div class="query-collection-header searched-query-header"><p style="font-size: 24px;">Searched Query</p></div>
+<div class="provider-name searched-query-provider-name" style="margin-top: 80px;">
+    <b>
+            <span class="querySno grey-text text-darken-1" style="font-size: 1.3rem">
+                #{{ searchQuery.id }}
+            </span>
+        Provider Name:
+    </b>
+    {{ searchQuery.name }}
+</div>
+<div class="card query-collection-item" style="padding: 10px;">
+    <div class="row">
+
+        <div class="provider-qualification col l6 m6 s12">
+            <b>Qualification: </b><br>
+            {% if searchQuery.qualification == "SPC" %}
+                Specialist
+            {% elif searchQuery.qualification == "Other" %}
+                Other
+            {% else %}
+                MBBS
+            {% endif %}
+            {% if searchQuery.qual_add_info != None %}
+                ({{ searchQuery.qual_add_info }})
+            {% endif %}
+        </div>
+        <div class="provider-email col l6 m6 s12">
+            <b>Email: </b><br>{{ searchQuery.email }}
+        </div>
+    </div>
+    <div class="row area-of-practice col s12" style="margin-left: 5px;">
+        <b>Area of Practice: </b>{{ searchQuery.area_of_practice }}
+    </div>
+    <div class="row query-details" style="margin: 0">
+        <div class="row" style="margin: 0 0 5px 0 ;">
+            <div class="col s2"><b>Query:</b></div>
+        </div>
+        <div class="query grey lighten-3"
+             style="border-radius: 3px; padding: 2px 5px 5px 5px; margin: 0 7px;">
+            {{ searchQuery.query|linebreaks }}
+        </div>
+    </div>
+    <div class="row query-start-time" style="margin: 10px 10px 5px 10px;">
+        <div>
+            <b>Query Initiated
+                on: </b>{{ searchQuery.query_start_time|timezone:"Asia/Kolkata" }}
+        </div>
+    </div>
+    <div class="reply-container" style="margin: 10px 10px 5px 10px;">
+        <div class="row reply-header" style="margin: 0 0 5px 0;">
+            <div><b>Previous Replies:</b></div>
+        </div>
+        <div class="row reply-body"
+             style="border-left: 3px #316DAC solid; border-radius: 3px; padding-left: 5px;">
+            {% for reply in searchReplies %}
+                <div class="reply-content grey lighten-3" data-present="True"
+                     style="padding: 5px 5px; margin-top: 20px; border-left: 3px #ff9800 solid; border-radius: 3px;">
+                    <div class="reply-expert-name">
+                        <strong>Expert Name:</strong>
+                        Dr. {{ reply.expert.user.first_name }} {{ reply.expert.user.last_name }}
+                    </div>
+
+                    <div class="reply-content">
+                        <strong>Reply: </strong>
+                        {{ reply.reply|linebreaks }}
+                    </div>
+                    {% if reply.reply_extra != None and reply.reply_extra != "" %}
+                        <div class="reply-extra">
+                            <strong>Extra Comments: </strong>
+                            {{ reply.reply_extra|linebreaks }}
+                        </div>
+                    {% endif %}
+                    <div class="reply-time">
+                        <strong>Reply Time: </strong>
+                        {{ reply.reply_datetime|timezone:"Asia/Kolkata" }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row query-feedback-{{ forloop.counter }}">
+        <form class="col s12" queryId="{{ searchQuery.id }}" name="replyForm" id="replyForm--1">
+            {% csrf_token %}
+            {% for field in replyForm.visible_fields %}
+                <div class="input-field">
+                    {{ field }}
+                    <label class="active" for="{{ field.auto_id }}">{{ field.label }}</label>
+                    <b><span class="helper-text" helper-for="{{ field.name }}--1"></span></b>
+                </div>
+            {% endfor %}
+            {% for field in replyForm.hidden_fields %}
+                {{ field }}
+            {% endfor %}
+            <div button-for="-1" class="replyFormSubmitButton btn waves-effect green waves-yellow">
+                <div class="preloader-container" style="display: flex; align-items: center;">
+                    <div class="preloader" style="display: flex;"></div>
+                    <div class="loader-text-data">Send Reply</div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $(".replyFormSubmitButton").click(function () {
+        idx = $(this).attr("button-for");
+        frm = $("#replyForm-" + idx);
+        queryId = frm.attr("queryId");
+        replyFormSubmitButtonAction(idx, frm, queryId);
+    });
+</script>

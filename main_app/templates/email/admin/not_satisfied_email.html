@@ -1,0 +1,53 @@
+{% load tz %}
+<div>
+    <p>
+        {% with replies.last as last_reply %}
+            {{ query.name }} has marked Dr. {{ last_reply.expert.user.first_name }} {{ last_reply.expert.user.last_name }}'s
+            ({{ last_reply.expert.user.groups.all|first }}) reply for query #{{ query.id }} as unsatisfactory.
+        {% endwith %}
+    </p>
+    <div>
+        <div style="padding-left: 5px; border-radius: 3px; border-left: 3px #ff9800 solid;">
+            <p><b>Doctor Name: </b> Dr. {{ query.name }}</p>
+            <p><b>Qualification: </b> {% if query.qualification == "OTR" %}Other{% else %}{{ query.qualification }} {% endif %}</p>
+            <p><b>Area of Practice: </b> {{ query.area_of_practice }}</p>
+            <p><b>Practice Type: </b> {% if query.practice_type == '1' %}Public{% else %}Private{% endif %}</p>
+            <p><b>Mobile Number: </b> {{ query.mobile_no }}</p>
+        </div>
+        <p><b>Query Number: </b> {{ query.id }}</p>
+        <b>Query Body:</b>
+        <div style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 3px;">
+            {{ query.query|linebreaks }}
+        </div>
+        <b style="margin-top: 40px;">Reply Thread:</b>
+        <div class="row reply-body" style="border-left: 3px #316DAC solid; border-radius: 3px; padding-left: 5px;">
+            {% for reply in replies %}
+                {% if reply.query.id == query.id %}
+                    <div class="reply-content grey lighten-3" data-present="True"
+                         style="padding: 5px 5px; margin-top: 20px; {% if forloop.last %}background-color: rgba(0, 0, 0, 0.2); border-left: 5px {% else %}background-color: rgba(0, 0, 0, 0.1); border-left: 3px{% endif %} #ff9800 solid; border-radius: 3px;">
+                        <div class="reply-expert-name">
+                            <strong>Expert Name:</strong>
+                            Dr. {{ reply.expert.user.first_name }} {{ reply.expert.user.last_name }}
+                        </div>
+
+                        <div class="reply-content">
+                            <strong>Reply: </strong>
+                            {{ reply.reply|linebreaks }}
+                        </div>
+                        {% if reply.reply_extra != None and reply.reply_extra != "" %}
+                            <div class="reply-extra">
+                                <strong>Extra Comments: </strong>
+                                {{ reply.reply_extra|linebreaks }}
+                            </div>
+                        {% endif %}
+                        <div class="reply-time">
+                            <strong>Reply Time: </strong>
+                            {{ reply.reply_datetime|timezone:"Asia/Kolkata" }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    </div>
+</div>

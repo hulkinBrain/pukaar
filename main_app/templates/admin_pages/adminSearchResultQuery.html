@@ -1,0 +1,192 @@
+{% load tz %}
+<style>
+    @media only screen and (max-width: 500px){
+        strong{
+            font-weight: bold;
+        }
+    }
+</style>
+<div class="query-collection-header"><h4>Searched Query</h4></div>
+<div class="provider-name" style="margin-top: 80px;">
+    <strong>
+            <span class="querySno" style="font-size: 1.2rem">
+                #{{ searchQuery.id }}
+            </span>
+        Provider Name:
+    </strong>
+    {{ searchQuery.name }}
+</div>
+<div class="card query-collection-item" style="padding: 10px;">
+    <div class="status-messages" style="display: flex; padding: 0 10.5px; margin-bottom: 10px; margin-top: 5px;">
+
+    {% if searchQuery.expert_assigned != None and searchQuery.needReply == False and searchQuery.resolved == True%}
+        <div class="status green lighten-1">
+            Query Closed <i class="material-icons" style="margin-left: 5px;">check</i>
+        </div>
+    {% else %}
+        {% if searchQuery.expert_assigned == None %}
+            <div class="status red lighten-3">
+                Expert Not Assigned
+            </div>
+        {% else %}
+            <div class="status green lighten-1">
+                Expert Assigned
+            </div>
+        {% endif %}
+
+        {% if searchQuery.needReply %}
+            <div class="status red lighten-3">
+                Needs Reply
+            </div>
+        {% else %}
+            <div class="status green lighten-1">
+                Reply Given
+            </div>
+        {% endif %}
+
+        {% if searchQuery.resolved == True %}
+            <div class="status green lighten-1">
+                Resolved
+            </div>
+        {% else %}
+            <div class="status red lighten-3">
+                Not Resolved
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+    <div class="row">
+        <div class="provider-qualification col l6 m6 s12">
+            <strong>Qualification: </strong><br>
+            {% if searchQuery.qualification == "SPC" %}
+                Specialist
+            {% elif searchQuery.qualification == "OTR" %}
+                Other
+            {% else %}
+                MBBS
+            {% endif %}
+            {% if searchQuery.qual_add_info != None %}
+                ({{ searchQuery.qual_add_info }})
+            {% endif %}
+        </div>
+        <div class="provider-email col l6 m6 s12">
+            <strong>Email: </strong><br>{{ searchQuery.email }}
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 0;">
+        <div class="input-field provider-expert col l6 m6 s12"
+             querySno="{{ -1 }}"
+             queryId="{{ searchQuery.id }}">
+
+            <select id="expertSelect{{ -1 }}">
+                <option value="" selected disabled>Choose expert</option>
+                {% for expert in experts %}
+                    {% ifchanged expert.user.groups.all|first %}
+                        {% if forloop.counter == 1 %}
+                            <optgroup label="{{ expert.user.groups.all|first }}">
+                                {% elif forloop.counter <= experts.count %}
+                            </optgroup>
+                            <optgroup label="{{ expert.user.groups.all|first }}">
+                        {% endif %}
+                    {% endifchanged %}
+                {% if searchQuery.expert_assigned.id == expert.id %}
+                    <option selected value="{{ expert.id }}">{{ expert.user.first_name }} {{ expert.user.last_name }} {% if expert.last_chosen == True %} (Lastly Chosen){% endif %}</option>
+                {% else %}
+                    <option value="{{ expert.id }}">{{ expert.user.first_name }} {{ expert.user.last_name }}{% if expert.last_chosen == True %} (Lastly Chosen){% endif %}</option>
+                {% endif %}
+                {% if forloop.counter == experts.count %}
+                    </optgroup>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <label>Choose Expert</label>
+        </div>
+        <div class="col l6 m6 s12">
+            <div btn-no="-1" class="setExpertButton btn waves-effect blue">
+                <div class="preloader-container" style="display: flex; align-items: center;">
+                    <div class="preloader" style="display: flex;"></div>
+                    <div class="loader-text-data">Send Email</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row query-details" style="margin: 0">
+        <div class="row" style="margin: 0 0 5px 0 ;">
+            <div class="col s2"><strong>Query:</strong></div>
+        </div>
+        <div class="query grey lighten-3"
+             style="border-radius: 3px; padding: 2px 5px 5px 5px; margin: 0 7px;">
+            {{ searchQuery.query|linebreaks }}
+        </div>
+    </div>
+    <div class="row query-start-time" style="margin: 10px 10px 5px 10px;">
+        <div>
+            <strong>Query Initiated
+                on: </strong>{{ searchQuery.query_start_time|timezone:"Asia/Kolkata" }}
+        </div>
+    </div>
+    <div class="reply-container" style="border-radius: 3px; margin: 10px 10px 5px 10px;">
+        <div class="row reply-header">
+            <div><strong>Replies:</strong></div>
+        </div>
+        <div class="row reply-body"
+             style="margin-top: 0; border-left: 3px #316DAC solid; border-radius: 3px; padding-left: 5px;">
+            {% for reply in searchReplies %}
+                {% if reply.query == searchQuery.id %}
+
+                    <div class="reply-content grey lighten-3"
+                         style="padding: 5px 5px; margin-top: 20px; border-left: 3px #ff9800 solid; border-radius: 3px;">
+                        <div class="reply-expert-name">
+                            <strong>Expert Name:</strong>
+                            Dr. {{ reply.expert__user__first_name }} {{ reply.expert__user__last_name }}
+                        </div>
+
+                        <div class="reply-expert-username">
+                            <strong>Username: </strong>
+                            {{ reply.expert__user__username }}
+                        </div>
+                        <div class="reply-content">
+                            <strong>Reply: </strong>
+                            {{ reply.reply|linebreaks }}
+                        </div>
+                        {% if reply.reply_extra != None and reply.reply_extra != "" %}
+                            <div class="reply-extra">
+                                <strong>Extra Comments: </strong>
+                                {{ reply.reply_extra|linebreaks }}
+                            </div>
+                        {% endif %}
+                        <div class="reply-time">
+                            <strong>Reply Time: </strong>
+                            {{ reply.reply_datetime|timezone:"Asia/Kolkata" }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{#<form name="setExpertForm" id="setExpertForm">#}
+{#    {% csrf_token %}#}
+{#    {{ setExpertForm }}#}
+{#</form>#}
+<style>
+    .status{
+        font-size: 16px;
+        border-radius: 3px;
+        padding: 0 7px;
+        display: flex;
+        align-items: center;
+        margin-right: 5px;
+    }
+</style>
+<script>
+    var selectElemSearch = document.querySelector('#expertSelect-1');
+    var selectElemInstance = M.Select.init(selectElemSearch);
+</script>
+<script>
+    $(".setExpertButton").click(function () {
+        no = $(this).attr("btn-no");
+        providerExpert = $(this).parent().siblings(".provider-expert");
+        setExpertAction(no, providerExpert);
+    });
+</script>

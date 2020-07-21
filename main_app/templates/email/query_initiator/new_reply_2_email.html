@@ -1,0 +1,56 @@
+{% load tz %}
+<div>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<!--Import materialize.css-->
+<link type="text/css" rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/css/materialize.min.css"
+      media="screen,projection"/>
+    Greetings Dr. {{ query.name }},
+    <p>
+        {% with replies.last as last_reply %}
+            Dr. {{ last_reply.expert.user.first_name }} {{ last_reply.expert.user.last_name }}
+            ({{ last_reply.expert.user.groups.all|first }}) has replied to your query and has requested for a second opinion.
+            We have forwarded your query to another doctor who will soon give you a reply.
+        {% endwith %}
+    </p>
+    <div>
+        <p><b>Query Number: </b> {{ query.id }}</p>
+        <b>Query Body:</b>
+        <div style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 3px;">
+            {{ query.query|linebreaks }}
+        </div>
+        <b style="margin-top: 40px;">Reply Thread:</b>
+        <div class="row reply-body" style="border-left: 3px #316DAC solid; border-radius: 3px; padding-left: 5px;">
+            {% for reply in replies %}
+                {% if reply.query.id == query.id %}
+                    <div class="reply-content" data-present="True"
+                         style="padding: 5px 5px; margin-top: 20px; {% if forloop.last %}background-color: rgba(0, 0, 0, 0.2); border-left: 5px {% else %}background-color: rgba(0, 0, 0, 0.1); border-left: 3px{% endif %} #ff9800 solid; border-radius: 3px;">
+                        <div class="reply-expert-name">
+                            <strong>Expert Name:</strong>
+                            Dr. {{ reply.expert.user.first_name }} {{ reply.expert.user.last_name }}
+                        </div>
+
+                        <div class="reply-content">
+                            <strong>Reply: </strong>
+                            {{ reply.reply|linebreaks }}
+                        </div>
+                        {% if reply.reply_extra != None and reply.reply_extra != "" %}
+                            <div class="reply-extra">
+                                <strong>Extra Comments: </strong>
+                                {{ reply.reply_extra|linebreaks }}
+                            </div>
+                        {% endif %}
+                        <div class="reply-time">
+                            <strong>Reply Time: </strong>
+                            {{ reply.reply_datetime|timezone:"Asia/Kolkata" }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <p style="margin-top: 40px;">
+            Best Regards,<br>
+            Warmline
+        </p>
+    </div>
+</div>
