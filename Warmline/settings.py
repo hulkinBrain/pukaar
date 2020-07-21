@@ -81,8 +81,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='689326631490-f6bvprn4mpr2gflkua4sqrn88hi40png.apps.googleusercontent.com'  #Paste CLient Key
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'AY0aF0O6DpUr98NSutInhFpu'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='689326631490-gb4l0rh6jodd44gttci65ot56grqvk9o.apps.googleusercontent.com'  #Paste CLient Key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '20Dg9X3aHjI-YQf3ncQMGI9y'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
