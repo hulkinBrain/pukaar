@@ -24,7 +24,7 @@ PROJECT_DIR=os.path.dirname(__file__)
 SECRET_KEY = 'a96(yhnsd$*+y4()&_j=hb%^3w&qlswlsk-hktdz_yd@@b&h$0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'pukaar1.herokuapp.com', 'https://pukaar1.herokuapp.com']
 
@@ -81,8 +81,14 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='689326631490-gb4l0rh6jodd44gttci65ot56grqvk9o.apps.googleusercontent.com'  #Paste CLient Key
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '20Dg9X3aHjI-YQf3ncQMGI9y'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='689326631490-f6bvprn4mpr2gflkua4sqrn88hi40png.apps.googleusercontent.com'  #Paste CLient Key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'AY0aF0O6DpUr98NSutInhFpu'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'warmline02@gmail.com'
+EMAIL_HOST_PASSWORD = 'Qwerty)987'
+EMAIL_USE_SSL = True
 
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
@@ -162,12 +168,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'warmline02@gmail.com'
-EMAIL_HOST_PASSWORD = 'Qwerty)987'
-EMAIL_USE_SSL = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
