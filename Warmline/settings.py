@@ -24,7 +24,7 @@ PROJECT_DIR=os.path.dirname(__file__)
 SECRET_KEY = 'a96(yhnsd$*+y4()&_j=hb%^3w&qlswlsk-hktdz_yd@@b&h$0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'pukaar1.herokuapp.com', 'https://pukaar1.herokuapp.com']
 
