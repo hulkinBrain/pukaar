@@ -282,12 +282,12 @@ def set_expert_view(request):
                 Query.objects.filter(pk=queryId).update(expert_assigned=expert, needReply=True)
 
                 # NOTIFY EXPERT
-                sendTo = SendTo.Admin()
+                sendToAdmin = SendTo().Admin()
                 query = Query.objects.get(id=queryId)
                 query.resolved = False
                 query.save()
                 replies = Reply.objects.filter(query=query)
-                sendTo.expert_set_notify(query, expert.user.email, replies)
+                sendToAdmin.expert_set_notify(query, expert.user.email, replies)
 
         else:
             print(setExpertForm.errors)

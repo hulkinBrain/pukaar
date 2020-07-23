@@ -450,7 +450,7 @@
             }
         </style>
         <script>
-            window.setExpertAction = function(no, providerExpert){
+            function setExpertAction(no, providerExpert){
                 element = $(".setExpertButton[btn-no="+no+"] .preloader-container");
                 setExpertButton = $(".setExpertButton[btn-no="+no+"]");
                 setExpertButton.removeClass("red lighten-2").addClass("blue");

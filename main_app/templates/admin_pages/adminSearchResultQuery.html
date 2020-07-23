@@ -102,7 +102,7 @@
             <label>Choose Expert</label>
         </div>
         <div class="col l6 m6 s12">
-            <div btn-no="-1" class="setExpertButton btn waves-effect blue">
+            <div btn-no="-1" class="setExpertButton1 btn waves-effect blue">
                 <div class="preloader-container" style="display: flex; align-items: center;">
                     <div class="preloader" style="display: flex;"></div>
                     <div class="loader-text-data">Send Email</div>
@@ -184,7 +184,7 @@
     var selectElemInstance = M.Select.init(selectElemSearch);
 </script>
 <script>
-    $(".setExpertButton").click(function () {
+    $(".setExpertButton1").click(function () {
         no = $(this).attr("btn-no");
         providerExpert = $(this).parent().siblings(".provider-expert");
         setExpertAction(no, providerExpert);
