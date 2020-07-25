@@ -1,0 +1,9 @@
+<div class="input-field specialtySelect">
+    <select onchange="setUserGroup(this)">
+        <option value="" disabled selected>Choose Specialty</option>
+        {% for group in groups %}
+            <option value="{{ group.id }}" {% if group == user.groups.all.0 and user.groups.all|length > 0 and default == 0 %}selected{% endif %}>{{ group }}</option>
+        {% endfor %}
+    </select>
+    <label>Specialty</label>
+</div>

@@ -1,0 +1,26 @@
+.userMasterContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.userContainer {
+    padding: 10px;
+    display: flex;
+    /*flex-grow: 1;*/
+    margin: 5px;
+    flex-direction: row;
+    align-content: center;
+}
+
+.userNameEmailContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.specialtySelect {
+    margin-left: 10px;
+}

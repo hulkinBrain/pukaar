@@ -91,74 +91,78 @@ def submit_query(request):
 
 
 def expert_view(request):
-    if Expert.objects.filter(user=request.user).count() > 0:
-        if request.method == "GET":
-            replyForm = ReplyForm()
-            expert = Expert.objects.filter(user=request.user).get()
-            queries_list = Query.objects.filter(expert_assigned=expert, needReply=True)\
-                .values('id', 'name', 'qualification', 'qual_add_info', 'area_of_practice',
-                        'email', 'query', 'query_start_time')\
-                .order_by('query_start_time')
-
-            noOfPages = int(math.ceil(len(queries_list)/ITEMS_PER_PAGE))
-
-            paginator = Paginator(queries_list, ITEMS_PER_PAGE)
-            page = request.GET.get('page')
-            if page == None:
-                page = 1
-            queries = paginator.get_page(page)
-
-            # TO FETCH REPLIES FOR QUERIES UNDER 'THIS' EXPERT
-            query_id_list = []
-            for i in range(queries_list.count()):
-                query_id_list.append(queries_list[i]['id'])
-            replies = Reply.objects.filter(query__in=query_id_list)
-
-            hashGen = HashGenerator()
-            expert_hash_string = hashGen.hashstring_generator(str(expert.id)+expert.user.email)
-            context = {'replyForm': replyForm, 'queries': queries, 'replies': replies,
-                       'noOfPages': noOfPages, 'userHash': expert_hash_string}
-            return render(request, 'expert.html', context)
-
-        elif request.method == "POST":
-            replyForm = ReplyForm(request.POST)
-            if replyForm.is_valid():
-                reply = replyForm.cleaned_data["reply"]
-                reply_extra = replyForm.cleaned_data['reply_extra']
-                queryId = replyForm.cleaned_data['queryId']
-
-                new_reply = Reply(
-                    reply=reply,
-                    query=Query.objects.filter(id=queryId).get(),
-                    expert=Expert.objects.filter(user=request.user).get(),
-                    reply_extra=reply_extra,
-                    reply_datetime=timezone.now(),
-                )
-                new_reply.save()
-
-                if reply_extra == "" or reply_extra == None:
-                    Query.objects.filter(id=queryId).update(needReply=False)
-                    query = Query.objects.filter(id=queryId).get()
-                    replies = Reply.objects.filter(query=query)
-
-                    send_to = SendTo()
-                    send_to.Admin().new_reply_notify(query, replies, False)
-                    send_to.Initiator().new_reply_notify(query, replies, False)
-                else:
-                    Query.objects.filter(id=queryId).update(expert_assigned=None, needReply=True)
-                    query = Query.objects.get(id=queryId)
-                    replies = Reply.objects.filter(query=query)
-
-                    send_to = SendTo()
-                    send_to.Admin().new_reply_notify(query, replies, True)
-                    send_to.Initiator().new_reply_notify(query, replies, True)
-
-                return HttpResponse("Feedback sent")
-            else:
-                return JsonResponse(dict(replyForm.errors.items()))
-
+    a = request.user
+    if request.user.is_superuser:
+        return redirect('/setExpertView/')
     else:
-        return HttpResponseRedirect('/logout/')
+        if Expert.objects.filter(user=request.user).count() > 0:
+            if request.method == "GET":
+                replyForm = ReplyForm()
+                expert = Expert.objects.filter(user=request.user).get()
+                queries_list = Query.objects.filter(expert_assigned=expert, needReply=True)\
+                    .values('id', 'name', 'qualification', 'qual_add_info', 'area_of_practice',
+                            'email', 'query', 'query_start_time')\
+                    .order_by('query_start_time')
+
+                noOfPages = int(math.ceil(len(queries_list)/ITEMS_PER_PAGE))
+
+                paginator = Paginator(queries_list, ITEMS_PER_PAGE)
+                page = request.GET.get('page')
+                if page == None:
+                    page = 1
+                queries = paginator.get_page(page)
+
+                # TO FETCH REPLIES FOR QUERIES UNDER 'THIS' EXPERT
+                query_id_list = []
+                for i in range(queries_list.count()):
+                    query_id_list.append(queries_list[i]['id'])
+                replies = Reply.objects.filter(query__in=query_id_list)
+
+                hashGen = HashGenerator()
+                expert_hash_string = hashGen.hashstring_generator(str(expert.id)+expert.user.email)
+                context = {'replyForm': replyForm, 'queries': queries, 'replies': replies,
+                           'noOfPages': noOfPages, 'userHash': expert_hash_string}
+                return render(request, 'expert.html', context)
+
+            elif request.method == "POST":
+                replyForm = ReplyForm(request.POST)
+                if replyForm.is_valid():
+                    reply = replyForm.cleaned_data["reply"]
+                    reply_extra = replyForm.cleaned_data['reply_extra']
+                    queryId = replyForm.cleaned_data['queryId']
+
+                    new_reply = Reply(
+                        reply=reply,
+                        query=Query.objects.filter(id=queryId).get(),
+                        expert=Expert.objects.filter(user=request.user).get(),
+                        reply_extra=reply_extra,
+                        reply_datetime=timezone.now(),
+                    )
+                    new_reply.save()
+
+                    if reply_extra == "" or reply_extra == None:
+                        Query.objects.filter(id=queryId).update(needReply=False)
+                        query = Query.objects.filter(id=queryId).get()
+                        replies = Reply.objects.filter(query=query)
+
+                        send_to = SendTo()
+                        send_to.Admin().new_reply_notify(query, replies, False)
+                        send_to.Initiator().new_reply_notify(query, replies, False)
+                    else:
+                        Query.objects.filter(id=queryId).update(expert_assigned=None, needReply=True)
+                        query = Query.objects.get(id=queryId)
+                        replies = Reply.objects.filter(query=query)
+
+                        send_to = SendTo()
+                        send_to.Admin().new_reply_notify(query, replies, True)
+                        send_to.Initiator().new_reply_notify(query, replies, True)
+
+                    return HttpResponse("Feedback sent")
+                else:
+                    return JsonResponse(dict(replyForm.errors.items()))
+
+        else:
+            return HttpResponseRedirect('/logout/')
 
 
 def set_expert_view(request):
@@ -255,43 +259,79 @@ def set_expert_view(request):
                     'tabNo:': tabNo
                 }
 
+            if tabNo == "4":
+                users = User.objects.all()
+                experts = Expert.objects.all()
+                isExpert = list(map(lambda user: experts.filter(user=user).count(), users))
+                context = {
+                    'users': User.objects.all(),
+                    'isExpert': isExpert,
+                    'groups': Group.objects.all(),
+                }
+
             return render(request, "admin_pages/setExpert.html", context)
 
     elif request.method == "POST":
-        setExpertForm = SetExpertForm(request.POST)
-        if setExpertForm.is_valid():
-            queryId = setExpertForm.cleaned_data['queryId']
-            expertId = setExpertForm.cleaned_data['expertId']
-            if queryId == None or expertId == None:
-                return HttpResponse("Error")
+        #### To toggle user as an expert
+        jsonData = json.loads(request.body)
+        if int(jsonData['userId']) != 'None':
+            userId = int(jsonData['userId'])
+            toUnset = int(jsonData['toUnset'])
+            user = User.objects.get(id=userId)
+            if toUnset == 0:
+                newExpert = Expert.objects.create(user=user)
+                newExpert.save()
             else:
-                expert = Expert.objects.filter(id=expertId).get()
-
-                # GET THE GROUP NAME OF CHOSEN EXPERT
-                expert_group = User.objects.filter(username=expert.user).values("groups")
-
-                # FIND USERS WHO ARE IN THAT GROUP
-                last_chosen_doc = User.objects.filter(groups__in=expert_group)
-
-                # SET LAST_CHOSEN AS FALSE FOR THE LASTLY CHOSEN EXPERT
-                Expert.objects.filter(user__in=last_chosen_doc, last_chosen=True).update(last_chosen=False)
-
-                # SET LAST_CHOSEN AS TRUE FOR THE CURRENT EXPERT
-                expert.last_chosen = True
-                expert.save()
-                Query.objects.filter(pk=queryId).update(expert_assigned=expert, needReply=True)
-
-                # NOTIFY EXPERT
-                sendToAdmin = SendTo().Admin()
-                query = Query.objects.get(id=queryId)
-                query.resolved = False
-                query.save()
-                replies = Reply.objects.filter(query=query)
-                sendToAdmin.expert_set_notify(query, expert.user.email, replies)
-
+                expert = Expert.objects.get(user=user)
+                user.groups.clear()
+                expert.delete()
+            return JsonResponse({'status': 'Success'})
         else:
-            print(setExpertForm.errors)
-        return HttpResponse("Success")
+            setExpertForm = SetExpertForm(request.POST)
+            if setExpertForm.is_valid():
+                queryId = setExpertForm.cleaned_data['queryId']
+                expertId = setExpertForm.cleaned_data['expertId']
+                if queryId == None or expertId == None:
+                    return HttpResponse("Error")
+                else:
+                    expert = Expert.objects.filter(id=expertId).get()
+
+                    # GET THE GROUP NAME OF CHOSEN EXPERT
+                    expert_group = User.objects.filter(username=expert.user).values("groups")
+
+                    # FIND USERS WHO ARE IN THAT GROUP
+                    last_chosen_doc = User.objects.filter(groups__in=expert_group)
+
+                    # SET LAST_CHOSEN AS FALSE FOR THE LASTLY CHOSEN EXPERT
+                    Expert.objects.filter(user__in=last_chosen_doc, last_chosen=True).update(last_chosen=False)
+
+                    # SET LAST_CHOSEN AS TRUE FOR THE CURRENT EXPERT
+                    expert.last_chosen = True
+                    expert.save()
+                    Query.objects.filter(pk=queryId).update(expert_assigned=expert, needReply=True)
+
+                    # NOTIFY EXPERT
+                    sendToAdmin = SendTo().Admin()
+                    query = Query.objects.get(id=queryId)
+                    query.resolved = False
+                    query.save()
+                    replies = Reply.objects.filter(query=query)
+                    sendToAdmin.expert_set_notify(query, expert.user.email, replies)
+
+            else:
+                print(setExpertForm.errors)
+            return HttpResponse("Success")
+
+def set_group(request):
+    if request.method == 'POST':
+        jsonData = json.loads(request.body)
+        userId = int(jsonData['userId'])
+        user = User.objects.get(id=userId)
+        groupId = int(jsonData['groupId'])
+        group = Group.objects.get(id=groupId)
+        user.groups.clear()
+        group.user_set.add(user)
+        return JsonResponse({'status': 'Success', 'group': group.name, 'username': user.first_name + ' ' + user.last_name})
 
 @csrf_exempt
 def receive_audio(request):
@@ -471,6 +511,7 @@ def search_query(request):
 
 
 def login_view(request):
+    a = request
     return redirect(expert_view(request))
 
 

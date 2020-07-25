@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 class Expert(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     mobile_regex = RegexValidator(regex=r'^\+\d{12}$')
-    mobile_no = models.CharField(validators=[mobile_regex], max_length=13, blank=False, null=False)
+    mobile_no = models.CharField(validators=[mobile_regex], max_length=13, blank=True, null=True)
     last_chosen = models.BooleanField(default=False, null=False)
 
 

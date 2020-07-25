@@ -104,7 +104,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-LOGIN_URL = 'login'
+# LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 WSGI_APPLICATION = 'Warmline.wsgi.application'
 

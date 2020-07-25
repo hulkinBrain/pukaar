@@ -7,6 +7,10 @@ def range1(var, noOfPages):
     return range(noOfPages)
 
 @register.filter
+def index(indexable, i):
+    return indexable[i]
+
+@register.filter
 def isEqual(getPage, forloopCounter):
     if getPage == str(forloopCounter):
         return True

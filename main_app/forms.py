@@ -19,7 +19,7 @@ class QueryForm(ModelForm):
             'qual_add_info': 'Expertise'
         }
         widgets = {
-            'area_of_practice': Textarea(attrs={'class': 'materialize-textarea'}),
+            'area_of_practice': Textarea(attrs={'class': 'materialize-textarea', 'placeholder': 'Delhi'}),
             'qual_add_info': TextInput(attrs={'disabled': ''}),
             'mobile_no': TextInput(attrs={'placeholder': '9876543210'}),
             'query': Textarea(attrs={'class': 'materialize-textarea'}),

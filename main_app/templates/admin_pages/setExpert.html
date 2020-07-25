@@ -1,23 +1,36 @@
 {% load tz %}
 {% load custom_filters %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>Admin View</title>
         {% include 'headImports.html' %}
+        <link href="{% static 'css/setExpert.css' %}" rel="stylesheet"/>
     </head>
     <body class="grey lighten-4">
-        <div class="col s12">
-            <ul class="tabs">
-                <li class="tab col s3"><a target="_self" href="?pageNo=1&tabNo=1" class="{% if request.GET.tabNo|isEqual:1 or request.GET.tabNo == None%}active{% endif %}">Expert Not Assigned</a></li>
-                <li class="tab col s3"><a target="_self" href="?pageNo=1&tabNo=2" class="{% if request.GET.tabNo|isEqual:2 %}active{% endif %}">Expert Assigned (Needs reply)</a></li>
-                <li class="tab col s3"><a target="_self" href="?pageNo=1&tabNo=3" class="{% if request.GET.tabNo|isEqual:3 %}active{% endif %}">Expert Assigned (Reply given)</a></li>
-            </ul>
-        </div>
+        <nav class="nav-extended">
+        {% if user.is_authenticated %}
+            <div class="nav-wrapper">
+                <a href="" class="brand-logo">Pukaar</a>
+                <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul id="nav-mobile" class="right">
+                    <li><a class="btn waves-effect waves-red red lighten-2" href={% url 'logout' %}>Logout</a></li>
+                </ul>
+            </div>
+        {% endif %}
+            <div class="nav-content">
+                <ul class="tabs">
+                    <li class="tab col s3"><a target="_self" href="?pageNo=1&tabNo=1" class="{% if request.GET.tabNo|isEqual:1 or request.GET.tabNo == None %}active{% endif %}">Expert Not Assigned</a></li>
+                    <li class="tab col s3"><a target="_self" href="?pageNo=1&tabNo=2" class="{% if request.GET.tabNo|isEqual:2 %}active{% endif %}">Expert Assigned (Needs reply)</a></li>
+                    <li class="tab col s3"><a target="_self" href="?pageNo=1&tabNo=3" class="{% if request.GET.tabNo|isEqual:3 %}active{% endif %}">Expert Assigned (Reply given)</a></li>
+                    <li class="tab col s3"><a target="_self" href="?pageNo=1&tabNo=4" class="{% if request.GET.tabNo|isEqual:4 %}active{% endif %}">Create/Assign Specialty to specialists</a></li>
+                </ul>
+            </div>
+        </nav>
         <div class="row defaultQueryContainer">
             <div id="expert-not-assigned" class="query-collection-container container">
-
                 <div class="query-collection">
                     <div class="query-collection-header"><h4>Expert Not Assigned Queries</h4></div>
                     {% if noOfPagesExpertNotAssigned > 1 %}
@@ -153,7 +166,6 @@
                 </div>
             </div>
             <div id="expert-assigned-need-reply-true" class="query-collection-container container">
-
                 <div class="query-collection">
                     <div class="query-collection-header"><h4>Expert Assigned Queries</h4></div>
                     {% if noOfPagesExpertAssignedNeedReplyTrue > 1 %}
@@ -289,7 +301,6 @@
                 </div>
             </div>
             <div id="expert-assigned-need-reply-false" class="query-collection-container container">
-
                 <div class="query-collection">
                     <div class="query-collection-header"><h4>Expert Assigned Queries</h4></div>
                     {% if noOfPagesExpertAssignedNeedReplyFalse > 1 %}
@@ -423,6 +434,37 @@
                     </ul>
                 </div>
             </div>
+            <div id="assign-roles" class="query-collection-container">
+                <div class="query-collection">
+                    <div class="query-collection-header container"><h4>Assign Roles</h4></div>
+                    <div class="userMasterContainer">
+                        {% for user in users %}
+                        {% if user.username != 'pukaar_admin' %}
+                        <div class="userContainer userContainer{{ user.id }} card" userId={{ user.id }}>
+                            <div class="userNameEmailContainer">
+                                <div>{{ user.first_name }} {{ user.last_name }}</div>
+                                <div>{{ user.email }}</div>
+                            </div>
+                            <div class="switch" style="display: flex; align-items: center; margin: 0 10px">
+                                <label>
+                                    Not Expert
+                                    <input {% if isExpert|index:forloop.counter0 != 0 %}checked {% endif %} isExpert={{ isExpert|index:forloop.counter0 }} userId={{ user.id }}  class="setUserAsExpertSwitch" type="checkbox" onclick="setUserAsExpert(this, {firstName: '{{ user.first_name }}', lastName: '{{ user.last_name }}'})">
+                                    <span class="lever"></span>
+                                    Expert
+                                </label>
+                            </div>
+                            <div class="selectSpecialtyContainer">
+                            {% if isExpert|index:forloop.counter0 != 0 %}
+                                {% include 'admin_pages/selectGroupDropdown.html' with default=0 %}
+                            {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
         </div>
 
         <form name="setExpertForm" id="setExpertForm">
@@ -538,6 +580,54 @@
                 providerExpert = $(this).parent().siblings(".provider-expert");
                 setExpertAction(no, providerExpert);
             });
+
+            function setUserAsExpert(el, userName) {
+                let userId = el.parentElement.parentElement.parentElement.attributes.userId.value;
+                console.log(userId);
+                fetch({% url 'setExpertView' %}, {headers: {"X-CSRFToken": "{{ csrf_token }}"}, method: 'POST', body: JSON.stringify({userId: userId, toUnset: el.attributes.isExpert.value }) })
+                    .then(data => {
+                        return data.json();
+                    })
+                    .then(data => {
+                        if(data.status === "Success") {
+                            let toastText;
+                            if(parseInt(el.attributes.isExpert.value) === 0) {
+                                toastText = `${userName.firstName} ${userName.lastName} set as Expert`;
+                                el.setAttribute('isExpert', 1);
+                                let selectContainer = document.createElement("div");
+                                selectContainer.className = "selectSpecialtyContainer";
+                                selectContainer.innerHTML = `{% include 'admin_pages/selectGroupDropdown.html' with default=1 %}`;
+                                document.querySelector(`.userContainer${userId}`).appendChild(selectContainer);
+                                var selectElem = document.querySelectorAll('select');
+                                var selectElemInstance = M.Select.init(selectElem);
+                            }
+                            else {
+                                toastText = `${userName.firstName} ${userName.lastName} unset as Expert`;
+                                el.setAttribute('isExpert', 0);
+                                let parent = document.querySelector(`.userContainer${userId}`);
+                                parent.removeChild(parent.lastElementChild);
+                            }
+                            M.toast({html: toastText});
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+            }
+
+            function setUserGroup(el) {
+                let userId = el.parentElement.parentElement.parentElement.parentElement.attributes.userId.value;
+                console.log(userId);
+                let groupId = el.value;
+                fetch({% url 'setGroup' %}, {headers: {"X-CSRFToken": "{{ csrf_token }}"}, method: 'POST', body: JSON.stringify({groupId: groupId, userId: userId})})
+                .then(data => data.json())
+                .then(data => {
+                    if(data.status === "Success"){
+                        let toastText = `${data.username} set as ${data.group} expert`;
+                        M.toast({html: toastText});
+                    }
+                })
+            }
         </script>
 
         {# DISPLAY TOGGLING FOR EXPERT TABS #}
@@ -545,24 +635,35 @@
             tab1 = $("#expert-not-assigned");
             tab2 = $("#expert-assigned-need-reply-true");
             tab3 = $("#expert-assigned-need-reply-false");
+            tab4 = $("#assign-roles");
             {# DEFAULT #}
             tab1.show();
             tab2.hide();
             tab3.hide();
+            tab4.hide();
             if('{{ request.GET.tabNo }}' === "1"){
                 tab1.show();
                 tab2.hide();
                 tab3.hide();
+                tab4.hide();
             }
             else if('{{ request.GET.tabNo }}' === "2") {
                 tab1.hide();
                 tab2.show();
                 tab3.hide();
+                tab4.hide();
             }
             else if('{{ request.GET.tabNo }}' === "3") {
                 tab1.hide();
                 tab2.hide();
                 tab3.show();
+                tab4.hide();
+            }
+            else if('{{ request.GET.tabNo }}' === "4") {
+                tab1.hide();
+                tab2.hide();
+                tab3.hide();
+                tab4.show();
             }
             $(".tabs li:first-child").click(function(){
                tab1.show();
