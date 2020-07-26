@@ -31,10 +31,12 @@ https://pukaar1.herokuapp.com/setExpertView
 username: pukaar_admin
 password: Qwer!234*
 3. "Expert not assigned" tab contains queries which are new as well as queries which an expert has suggested to take a second opinion from another expert. For each query, choose an expert and press "Send email" to send an email notification to the selected expert. Queries can also be searched by their Number (#1 or #12, etc)
-New Query Notification:
-![Admin new query email notification](forReadme/1_admin_newQueryNotification.jpg)
-New Expert needs to be assigned:
+
+**New Query Notification:**![Admin new query email notification](forReadme/1_admin_newQueryNotification.jpg)
+
+**New Expert needs to be assigned:**
 ![Admin needs new expert to be assigned](forReadme/2_admin_toSetNewExpertNotification.jpg)
-5. "Expert assigned (needs reply)" tab contains queries which have been forwarded to experts but haven't yet been resolved. By pressing "Send email" button, a reminder can be sent to the chosen expert if a reply hasn't been given for some days.
-6. "Expert assigned (reply given)" tab contains queries which have received replies and have been marked satisfactory (marked by query initiator to denote the reply as satisfactory)
+
+4. "Expert assigned (needs reply)" tab contains queries which have been forwarded to experts but haven't yet been resolved. By pressing "Send email" button, a reminder can be sent to the chosen expert if a reply hasn't been given for some days.
+5. "Expert assigned (reply given)" tab contains queries which have received replies and have been marked satisfactory (marked by query initiator to denote the reply as satisfactory)
 
