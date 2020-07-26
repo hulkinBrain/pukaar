@@ -30,6 +30,7 @@ https://pukaar1.herokuapp.com/setExpertView
 *Admin url:* *https://pukaar1.herokuapp.com/admin
 username: pukaar_admin
 password: Qwer!234*
+![Add new specialty group](forReadme/1_admin_addNewGroup.gif)
 3. "Expert not assigned" tab contains queries which are new as well as queries which an expert has suggested to take a second opinion from another expert. For each query, choose an expert and press "Send email" to send an email notification to the selected expert. Queries can also be searched by their Number (#1 or #12, etc)
 
 **New Query Notification:**
