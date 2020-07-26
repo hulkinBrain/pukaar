@@ -273,8 +273,13 @@ def set_expert_view(request):
 
     elif request.method == "POST":
         #### To toggle user as an expert
-        jsonData = json.loads(request.body)
-        if int(jsonData['userId']) != 'None':
+        jsonData = None
+        try:
+            jsonData = json.loads(request.body)
+        except:
+            print("not json data")
+        if jsonData != None and int(json.loads(request.body)) != 'None':
+            jsonData = json.loads(request.body)
             userId = int(jsonData['userId'])
             toUnset = int(jsonData['toUnset'])
             user = User.objects.get(id=userId)
