@@ -278,8 +278,7 @@ def set_expert_view(request):
             jsonData = json.loads(request.body)
         except:
             print("not json data")
-        if jsonData != None and int(json.loads(request.body)) != 'None':
-            jsonData = json.loads(request.body)
+        if jsonData != None:
             userId = int(jsonData['userId'])
             toUnset = int(jsonData['toUnset'])
             user = User.objects.get(id=userId)
