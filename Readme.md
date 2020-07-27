@@ -19,6 +19,7 @@ Pukaar aims to connect local doctors with specialists across India for rapid res
 
 ### For Pukaar Admins
 ![Instructions for admin](forReadme/0_admin_usageInstruction.gif)
+
 *Note 1: Email addresses will be provided to Admins as well. After logging in, admin page will be shown. This page will only be accessible by the admins, but for demonstration it has no login requirements*
 
 *Note 2: Whenever there is a new query or if a query is answered, there is an email notification for the admins. The emails will be received once the admin emails are set up*
