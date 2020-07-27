@@ -34,11 +34,11 @@ password: Qwer!234*
 ![Add new specialty group](forReadme/1_admin_addNewGroup.gif)
 3. "Expert not assigned" tab contains queries which are new as well as queries which an expert has suggested to take a second opinion from another expert. For each query, choose an expert and press "Send email" to send an email notification to the selected expert. Queries can also be searched by their Number (#1 or #12, etc)
 
-**New Query Notification:**
+**New Query Email Notification:**
 
 ![Admin new query email notification](forReadme/1_admin_newQueryNotification.jpg)
 
-**New Expert needs to be assigned:**
+**New 'Expert needs to be assigned' Email notification:**
 
 ![Admin needs new expert to be assigned](forReadme/2_admin_toSetNewExpertNotification.jpg)
 
